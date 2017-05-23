@@ -22,14 +22,26 @@ def js(filepath):
     return static_file(filepath, root="static/js")
 
 
+@get("/static/json/<filepath:re:.*\.json>")
+def js(filepath):
+    return static_file(filepath, root="static/json")
+
+@get("/getJSON")
+def getJSON():
+    with open('static/json/data.json') as data_file:    
+        data = json.load(data_file)
+    return data
+
 @get("/graph")
 def get_graph():
-    q = request.query["q"]
-    print q
+    mir = request.query["mir"]
+    func = request.query["func"]
+    print func
+    print mir
     results = graph.run(
-        "MATCH (a:DNA)<-[:rna22]-(m:microRNA) WHERE m.title =~ {title}"
+        "MATCH (a:DNA)<-[function:rna22|pictar]-(m:microRNA) WHERE m.title =~ {title} AND type(function) =~ {func} "
         "RETURN m.title as microRNA, collect(a.name) as cast "
-        "LIMIT {limit}",{"title": "(?i).*" + q + ".*", "limit": 100})
+        "LIMIT {limit}",{"func": "(?i).*" + func + ".*","title": "(?i).*" + mir + ".*", "limit": 100})
     print results
     nodes = []
     rels = []
@@ -47,7 +59,8 @@ def get_graph():
                 source = i
                 i += 1
             rels.append({"source": source, "target": target})
-    return {"nodes": nodes, "links": rels}
+    with open('static/json/data.json', 'w') as outfile:
+        json.dump({"nodes": nodes, "links": rels}, outfile)
 
 
 if __name__ == "__main__":
