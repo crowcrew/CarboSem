@@ -34,11 +34,11 @@ def get_graph():
     nodes = []
     rels = []
     i = 0
-    for movie, cast in results:
-        nodes.append({"title": movie, "label": "movie"})
+    for mir, dna in results:
+        nodes.append({"title": mir, "label": "movie"})
         target = i
         i += 1
-        for name in cast:
+        for name in dna:
             actor = {"title": name, "label": "actor"}
             try:
                 source = nodes.index(actor)
