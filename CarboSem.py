@@ -35,13 +35,19 @@ def getJSON():
 @get("/graph")
 def get_graph():
     mir = request.query["mir"]
-    func = request.query["func"]
+    func = []
+    func = request.query["func"].split(",")
     print func
     print mir
-    results = graph.run(
-        "MATCH (a:DNA)<-[function:rna22|pictar]-(m:microRNA) WHERE m.title =~ {title} AND type(function) =~ {func} "
-        "RETURN m.title as microRNA, collect(a.name) as cast "
-        "LIMIT {limit}",{"func": "(?i).*" + func + ".*","title": "(?i).*" + mir + ".*", "limit": 100})
+    query = "MATCH (a:DNA)<-[function:"+func[0]
+    if(len(func)>1):
+        for val in func[1:]:
+            query+="|"
+            query+=val
+    query+="]-(m:microRNA {title:\""+mir+"\"}) "
+    query+=" RETURN m.title as microRNA, collect(a.name) as cast LIMIT 100"
+    print query
+    results = graph.run(query)
     print results
     nodes = []
     rels = []
