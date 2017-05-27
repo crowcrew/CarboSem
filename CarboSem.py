@@ -44,7 +44,7 @@ def get_graph():
         for val in func[1:]:
             query+="|"
             query+=val
-    query+="]-(m:microRNA {title:\""+mir+"\"}) "
+    query+="]-(m:microRNA) WHERE m.title STARTS WITH \"" + mir + "\""
     query+=" RETURN m.title as microRNA, collect(a.name) as cast LIMIT 100"
     print query
     results = graph.run(query)
