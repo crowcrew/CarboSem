@@ -1,47 +1,70 @@
+/*
+ * Copyright 2017 Aly Shmahell
+ */
 $(function () {
     function drawGraph() {
+        /*
+         * clean up previous svg
+         */
+        d3.select("svg").remove();
+        /*
+         * configure svg settings
+         */
         var width = window.innerWidth,
             height = window.innerHeight;
         var force = d3.layout.force()
             .charge(-200).linkDistance(30).size([width, height]);
-        d3.select("svg").remove();
+        /*
+         * create new svg
+         */
         var svg = d3.select("#graph").append("svg")
             .attr("width", width).attr("height", height)
             .attr("pointer-events", "all");
-        var query = $("#search").find("input[name=search]").val();
 
-
-        var functions = [];
-        $.each($("input[name=function]:checked"), function () {
-            functions.push($(this).val());
-        });
-        alert(functions);
-
-        $.get("/graph?mir=" + encodeURIComponent(query) + "&func=" + encodeURIComponent(functions));
+        /*
+         * TODO
+         * var query = $("#search").find("input[name=search]").val();
+         * $.get("/graph?mir=" + encodeURIComponent(query));
+         */
 
         d3.json("/getJSON", function (error, graph) {
-            if (error) return;
+            if (error) {
+                alert("Error, no JSON file found!");
+                return;
+            }
+
+            //var temp = Object.values((graph.nodes)[1])[1];
+            //alert(temp);
+
             force.nodes(graph.nodes).links(graph.links).start();
 
-            var link = svg.selectAll(".link")
+            var link = svg.selectAll("link")
                 .data(graph.links);
             link.enter().append("line")
                 .attr("class", "link");
             link.exit().remove();
 
-            var node = svg.selectAll(".node")
+            var node = svg.selectAll("node")
                 .data(graph.nodes);
             node.enter().append("circle")
                 .attr("class", function (d) {
                     return "node " + d.label
                 })
                 .attr("r", 10)
-                .call(force.drag)
-                .append("title")
-                .text(function (d) {
-                    return d.title;
-                })
+                .call(force.drag);
             node.exit().remove();
+
+            var nodeText = svg.selectAll("text")
+                .data(graph.nodes);
+            nodeText.enter().append("text")
+                .attr("font-family", "monospace")
+                .attr("font-size", "10px")
+                .attr("fill", "blue")
+                .text(function (d) {
+                    return d.title
+                })
+                .call(force.drag);
+            nodeText.exit().remove();
 
             force.on("tick", function () {
                 link.attr("x1", function (d) {
@@ -62,6 +85,13 @@ $(function () {
                     })
                     .attr("cy", function (d) {
                         return d.y;
+                    });
+
+                nodeText.attr("x", function (d) {
+                        return d.x + 10;
+                    })
+                    .attr("y", function (d) {
+                        return d.y + 10;
                     });
             });
         });

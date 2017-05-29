@@ -1,2 +1,3 @@
 # CarboSem
-a webapp for the DIANA project
+using jquery, d3.js, python and bottle micro-framework to create a webapp interface for the DIANA project  
+

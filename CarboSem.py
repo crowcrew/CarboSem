@@ -21,7 +21,6 @@ def css(filepath):
 def js(filepath):
     return static_file(filepath, root="static/js")
 
-
 @get("/static/json/<filepath:re:.*\.json>")
 def js(filepath):
     return static_file(filepath, root="static/json")
@@ -34,40 +33,8 @@ def getJSON():
 
 @get("/graph")
 def get_graph():
-    mir = request.query["mir"]
-    func = []
-    func = request.query["func"].split(",")
-    print func
-    print mir
-    query = "MATCH (a:DNA)<-[function:"+func[0]
-    if(len(func)>1):
-        for val in func[1:]:
-            query+="|"
-            query+=val
-    query+="]-(m:microRNA) WHERE m.title STARTS WITH \"" + mir + "\""
-    query+=" RETURN m.title as microRNA, collect(a.name) as cast LIMIT 100"
-    print query
-    results = graph.run(query)
-    print results
-    nodes = []
-    rels = []
-    i = 0
-    for mir, dna in results:
-        nodes.append({"title": mir, "label": "movie"})
-        target = i
-        i += 1
-        for name in dna:
-            actor = {"title": name, "label": "actor"}
-            try:
-                source = nodes.index(actor)
-            except ValueError:
-                nodes.append(actor)
-                source = i
-                i += 1
-            rels.append({"source": source, "target": target})
-    with open('static/json/data.json', 'w') as outfile:
-        json.dump({"nodes": nodes, "links": rels}, outfile)
-
+    # TODO
+    return
 
 if __name__ == "__main__":
     run(port=8080)

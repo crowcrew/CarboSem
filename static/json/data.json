@@ -1,1 +1,49 @@
-{"nodes": [{"label": "movie", "title": "Mir 1"}, {"label": "actor", "title": "Target 1"}, {"label": "movie", "title": "Mir 3"}, {"label": "movie", "title": "Mir 2"}, {"label": "actor", "title": "Target 4"}, {"label": "movie", "title": "Mir 5"}, {"label": "actor", "title": "Target 3"}], "links": [{"source": 1, "target": 0}, {"source": 1, "target": 2}, {"source": 4, "target": 3}, {"source": 1, "target": 3}, {"source": 6, "target": 5}]}
+{
+    "nodes": [{
+            "label": "microRNA",
+            "title": "Mir1"
+    }, {
+            "label": "microRNA",
+            "title": "Mir2"
+    }, {
+            "label": "microRNA",
+            "title": "Mir3"
+    }, {
+            "label": "microRNA",
+            "title": "Mir4"
+    },
+        {
+            "label": "DNA",
+            "title": "Target1"
+    }, {
+            "label": "DNA",
+            "title": "Target2"
+    }, {
+            "label": "DNA",
+            "title": "Target3"
+    }, {
+            "label": "DNA",
+            "title": "Target4"
+    }],
+    "links": [{
+        "source": 1,
+        "target": 0,
+        "type": "rna22"
+    }, {
+        "source": 1,
+        "target": 2,
+        "type": "pictar"
+    }, {
+        "source": 4,
+        "target": 3,
+        "type": "rna22"
+    }, {
+        "source": 1,
+        "target": 3,
+        "type": "pictar"
+    }, {
+        "source": 6,
+        "target": 5,
+        "type": "rna22"
+    }]
+}
