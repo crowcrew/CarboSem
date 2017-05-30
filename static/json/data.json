@@ -3,7 +3,7 @@
             "label": "microRNA",
             "title": "Mir1",
             "targets": [{
-                "target": 44,
+                "target": 4,
                 "type": "rna22"
             }, {
                 "target": 6,

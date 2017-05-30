@@ -2,6 +2,14 @@
  * Copyright 2017 Aly Shmahell
  */
 $(function () {
+    function submitQuery() {
+        /*
+         * TODO
+         * var query = $("#search").find("input[name=search]").val();
+         * $.get("/graph?mir=" + encodeURIComponent(query));
+         */
+    }
+
     function drawGraph() {
         /*
          * clean up previous svg
@@ -21,12 +29,6 @@ $(function () {
             .attr("width", width).attr("height", height)
             .attr("pointer-events", "all");
 
-        /*
-         * TODO
-         * var query = $("#search").find("input[name=search]").val();
-         * $.get("/graph?mir=" + encodeURIComponent(query));
-         */
-
         d3.json("/getJSON", function (error, graph) {
             if (error) {
                 alert("Error, no JSON file found!");
@@ -34,17 +36,41 @@ $(function () {
             }
 
             /*
-                        var nodess = [];
+                        var nodes = [];
                         var links = [];
-                        alert(nodess.length);
+                        for (var i = 0, len = graph.nodes.length; i < len; i++) {
+                            if (graph.nodes[i].targets) {
+                                nodes.push({
+                                    "label": graph.nodes[i].label,
+                                    "title": graph.nodes[i].title
+                                });
+                                for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
+                                    nodes.push({
+                                        "label": graph.nodes[graph.nodes[i].targets[j].target].label,
+                                        "title": graph.nodes[graph.nodes[i].targets[j].target].title
+                                    });
+                                    links.push({
+                                        "source": i,
+                                        "target": nodes.length
+                                    });
+                                }
+                            }
+                        }
+                        alert(nodes[1].title);
+                        alert(links[0].source);
+            */
+            /*
+                        var nodes = [];
+                        var links = [];
+                        alert(nodes.length);
                         for (var i = 0, len = graph.nodes.length; i < len; i++) {
                             if (graph.nodes[i].targets)
                                 for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                                    nodess.push({"label":graph.nodes[i].label,"title":graph.nodes[i].title});
+                                    nodes.push({"label":graph.nodes[i].label,"title":graph.nodes[i].title});
                                     alert(graph.nodes[i].targets[j].target);
                                 }
                         }
-                        alert(nodess[1].title);
+                        alert(nodes[1].title);
             */
 
             force.nodes(graph.nodes).links(graph.links).start();
@@ -109,4 +135,9 @@ $(function () {
         return false;
     }
     $("#search").submit(drawGraph);
+    $(".checkbox").change(function () {
+        if (this.checked) {
+            drawGraph();
+        }
+    });
 })
