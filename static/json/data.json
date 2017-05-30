@@ -1,16 +1,35 @@
 {
     "nodes": [{
             "label": "microRNA",
-            "title": "Mir1"
+            "title": "Mir1",
+            "targets": [{
+                "target": 44,
+                "type": "rna22"
+            }, {
+                "target": 6,
+                "type": "rna22"
+            }]
     }, {
             "label": "microRNA",
-            "title": "Mir2"
+            "title": "Mir2",
+            "targets": [{
+                "target": 5,
+                "type": "pictar"
+            }]
     }, {
             "label": "microRNA",
-            "title": "Mir3"
+            "title": "Mir3",
+            "targets": [{
+                "target": 6,
+                "type": "rna22"
+            }]
     }, {
             "label": "microRNA",
-            "title": "Mir4"
+            "title": "Mir4",
+            "targets": [{
+                "target": 7,
+                "type": "pictar"
+            }]
     },
         {
             "label": "DNA",
@@ -26,24 +45,24 @@
             "title": "Target4"
     }],
     "links": [{
-        "source": 1,
-        "target": 0,
+        "source": 0,
+        "target": 4,
         "type": "rna22"
     }, {
         "source": 1,
-        "target": 2,
-        "type": "pictar"
-    }, {
-        "source": 4,
-        "target": 3,
-        "type": "rna22"
-    }, {
-        "source": 1,
-        "target": 3,
-        "type": "pictar"
-    }, {
-        "source": 6,
         "target": 5,
+        "type": "pictar"
+    }, {
+        "source": 2,
+        "target": 6,
+        "type": "rna22"
+    }, {
+        "source": 3,
+        "target": 7,
+        "type": "pictar"
+    }, {
+        "source": 0,
+        "target": 6,
         "type": "rna22"
     }]
 }

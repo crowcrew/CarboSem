@@ -33,8 +33,19 @@ $(function () {
                 return;
             }
 
-            //var temp = Object.values((graph.nodes)[1])[1];
-            //alert(temp);
+            /*
+                        var nodess = [];
+                        var links = [];
+                        alert(nodess.length);
+                        for (var i = 0, len = graph.nodes.length; i < len; i++) {
+                            if (graph.nodes[i].targets)
+                                for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
+                                    nodess.push({"label":graph.nodes[i].label,"title":graph.nodes[i].title});
+                                    alert(graph.nodes[i].targets[j].target);
+                                }
+                        }
+                        alert(nodess[1].title);
+            */
 
             force.nodes(graph.nodes).links(graph.links).start();
 
