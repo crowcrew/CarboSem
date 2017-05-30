@@ -2,13 +2,11 @@
  * Copyright 2017 Aly Shmahell
  */
 $(function () {
-    function submitQuery() {
-        /*
-         * TODO
-         * var query = $("#search").find("input[name=search]").val();
-         * $.get("/graph?mir=" + encodeURIComponent(query));
-         */
-    }
+    /*
+     * TODO
+     * var query = $("#search").find("input[name=search]").val();
+     * $.get("/graph?mir=" + encodeURIComponent(query));
+     */
 
     function drawGraph() {
         /*
@@ -35,72 +33,83 @@ $(function () {
                 return;
             }
 
-            /*
-                        var nodes = [];
-                        var links = [];
-                        for (var i = 0, len = graph.nodes.length; i < len; i++) {
-                            if (graph.nodes[i].targets) {
-                                nodes.push({
-                                    "label": graph.nodes[i].label,
-                                    "title": graph.nodes[i].title
-                                });
-                                for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                                    nodes.push({
-                                        "label": graph.nodes[graph.nodes[i].targets[j].target].label,
-                                        "title": graph.nodes[graph.nodes[i].targets[j].target].title
-                                    });
-                                    links.push({
-                                        "source": i,
-                                        "target": nodes.length
-                                    });
-                                }
-                            }
-                        }
-                        alert(nodes[1].title);
-                        alert(links[0].source);
-            */
-            /*
-                        var nodes = [];
-                        var links = [];
-                        alert(nodes.length);
-                        for (var i = 0, len = graph.nodes.length; i < len; i++) {
-                            if (graph.nodes[i].targets)
-                                for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                                    nodes.push({"label":graph.nodes[i].label,"title":graph.nodes[i].title});
-                                    alert(graph.nodes[i].targets[j].target);
-                                }
-                        }
-                        alert(nodes[1].title);
-            */
 
-            force.nodes(graph.nodes).links(graph.links).start();
+            var checkboxVals = [];
+            $("#checkbox :checked").each(function () {
+                checkboxVals.push($(this).val());
+            });
+
+
+            var nodes = new Array();
+            var links = new Array();
+            for (var i = 0, len = graph.nodes.length; i < len; i++) {
+                if (graph.nodes[i].targets) {
+                    nodes.push({
+                        "label": graph.nodes[i].label,
+                        "title": graph.nodes[i].title
+                    });
+                    var source = nodes.length - 1;
+                    for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
+                        index = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
+                        var target;
+                        if (index > 0) {
+                            target = index;
+                        } else {
+                            nodes.push({
+                                "label": graph.nodes[graph.nodes[i].targets[j].target].label,
+                                "title": graph.nodes[graph.nodes[i].targets[j].target].title
+                            });
+                            target = nodes.length - 1;
+                        }
+                        links.push({
+                            "source": source,
+                            "target": target
+                        });
+                    }
+                }
+            }
+
+            var localGraph = {
+                "nodes": nodes,
+                "links": links
+            };
+
+            force.nodes(localGraph.nodes).links(localGraph.links).start();
+
 
             var link = svg.selectAll("link")
-                .data(graph.links);
+                .data(localGraph.links);
             link.enter().append("line")
-                .attr("class", "link");
+                .attr("class", "link")
+                .style("stroke", "#2e8540")
+                .style("stroke-width", 1);
             link.exit().remove();
 
             var node = svg.selectAll("node")
-                .data(graph.nodes);
+                .data(localGraph.nodes);
             node.enter().append("circle")
                 .attr("class", function (d) {
                     return "node " + d.label
                 })
                 .attr("r", 10)
+                .attr("fill", function (d) {
+                    if (d.label == "microRNA") return "#112e51";
+                    else return "#e31c3d";
+                })
+                .style("stroke", "#2e8540")
+                .style("stroke-width", 2)
                 .call(force.drag);
             node.exit().remove();
 
             var nodeText = svg.selectAll("text")
-                .data(graph.nodes);
+                .data(localGraph.nodes);
             nodeText.enter().append("text")
                 .attr("font-family", "monospace")
                 .attr("font-size", "10px")
-                .attr("fill", "blue")
+                .attr("fill", "black")
                 .text(function (d) {
                     return d.title
-                })
-                .call(force.drag);
+                });
             nodeText.exit().remove();
 
             force.on("tick", function () {
@@ -135,9 +144,7 @@ $(function () {
         return false;
     }
     $("#search").submit(drawGraph);
-    $(".checkbox").change(function () {
-        if (this.checked) {
-            drawGraph();
-        }
+    $("#checkbox").change(function () {
+        drawGraph();
     });
 })
