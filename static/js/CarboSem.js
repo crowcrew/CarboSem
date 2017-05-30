@@ -38,8 +38,7 @@ $(function () {
             $("#checkbox :checked").each(function () {
                 checkboxVals.push($(this).val());
             });
-
-
+            
             var nodes = new Array();
             var links = new Array();
             for (var i = 0, len = graph.nodes.length; i < len; i++) {
@@ -50,10 +49,16 @@ $(function () {
                     });
                     var source = nodes.length - 1;
                     for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                        index = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
+                        var checkboxIncrement = 0;
+                        var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
+                        if (checkboxIndex < 0)
+                            continue;
+                        else
+                            checkboxIncrement++;
+                        nodeIndex = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
                         var target;
-                        if (index > 0) {
-                            target = index;
+                        if (nodeIndex > 0) {
+                            target = nodeIndex;
                         } else {
                             nodes.push({
                                 "label": graph.nodes[graph.nodes[i].targets[j].target].label,
@@ -66,6 +71,8 @@ $(function () {
                             "target": target
                         });
                     }
+                    if (checkboxIncrement == 0)
+                        nodes.pop();
                 }
             }
 

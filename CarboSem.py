@@ -22,7 +22,7 @@ def js(filepath):
     return static_file(filepath, root="static/js")
 
 @get("/static/json/<filepath:re:.*\.json>")
-def js(filepath):
+def jsonfile(filepath):
     return static_file(filepath, root="static/json")
 
 @get("/getJSON")
