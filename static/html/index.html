@@ -1,29 +1,30 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type= "text/css" rel="stylesheet" href="static/css/bootstrap-3.0.3.css">
-    <link type= "text/css" rel="stylesheet" href="static/css/CarboSem.css">
-    <script type="text/javascript" src="static/js/jquery-1.11.0.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="static/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="static/css/CarboSem.css">
+    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="static/js/d3.v3.min.js"></script>
     <script type="text/javascript" src="static/js/CarboSem.js"></script>
     <title>Carbon Semantics</title>
 </head>
 
 <body>
-    <div role="navigation" class="navbar navbar-default navbar-static-top">
-        <div class="header-container">
-            <form role="search" class="form-inline" id="search">
-                <div class="form-group">
-                    <input type="text" value="" placeholder="Search for MicroRNA" class="form-control" name="search">
-                </div>
-                <div class="checkbox" id="checkbox">
-                    <label for="pictar"><input type="checkbox" name="function" value="pictar" checked>PicTar</label>
-                    <label for="rna22"><input type="checkbox" name="function" value="rna22" checked>RNA22</label>
-                </div>
-                <button class="btn btn-default" type="submit">Search</button>
-            </form>
-        </div>
+    <div role="navigation" class="container-fluid well navbar navbar-default navbar-static-top header-container" id="container">
+        <form role="search" class="form-inline" id="search">
+            <div class="form-group">
+                <input type="text" value="" placeholder="Search for MicroRNA" class="form-control" name="search">
+            </div>
+            <button class="btn btn-default" type="submit">Search</button>
+        </form>
+        <form role="search" class="form-inline" id="search">
+            <div class="checkbox" id="checkbox">
+                <label><input type="checkbox" name="function" value="pictar" id="pictar" checked>PicTar</label>
+                <label><input type="checkbox" name="function" value="rna22" id="rna22" checked>RNA22</label>
+            </div>
+        </form>
     </div>
     <div id="graph">
     </div>

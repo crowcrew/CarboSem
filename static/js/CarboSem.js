@@ -8,6 +8,7 @@ $(function () {
      * $.get("/graph?mir=" + encodeURIComponent(query));
      */
 
+
     function drawGraph() {
         /*
          * clean up previous svg
@@ -17,7 +18,8 @@ $(function () {
          * configure svg settings
          */
         var width = window.innerWidth,
-            height = window.innerHeight;
+            height = (80 * window.innerHeight)/100;
+        
         var force = d3.layout.force()
             .charge(-200).linkDistance(30).size([width, height]);
         /*
@@ -38,7 +40,8 @@ $(function () {
             $("#checkbox :checked").each(function () {
                 checkboxVals.push($(this).val());
             });
-            
+
+
             var nodes = new Array();
             var links = new Array();
             for (var i = 0, len = graph.nodes.length; i < len; i++) {
