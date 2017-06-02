@@ -8,18 +8,111 @@ $(function () {
      * $.get("/graph?mir=" + encodeURIComponent(query));
      */
 
+    function drawCheckBox() {
+
+        var side = 20,
+            x = 5,
+            y = 5,
+            checked = true,
+            clickEvent;
+
+        function checkBox(parent) {
+
+            var g = parent.append("g"),
+                box = g.append("rect")
+                .attr("width", side)
+                .attr("height", side)
+                .attr("x", x)
+                .attr("y", y)
+                .attr("rx", 6)
+                .attr("ry", 6)
+                .style({
+                    "fill-opacity": 0,
+                    "stroke-width": 5,
+                    "stroke": "black"
+                });
+
+            var mark = g.append("circle")
+                .attr("cx", x + side / 2)
+                .attr("cy", y + side / 2)
+                .attr("r", 5)
+                .style({
+                    "fill": (checked) ? "#000" : "#FFF",
+                    "stroke-width": 2
+                });
+
+            g.on("click", function () {
+                checked = !checked;
+                mark.style("fill", (checked) ? "#000" : "#FFF");
+                if (clickEvent)
+                    clickEvent();
+            });
+        }
+        checkBox.x = function (val) {
+            x = val;
+            return checkBox;
+        }
+        checkBox.y = function (val) {
+            y = val;
+            return checkBox;
+        }
+        checkBox.checked = function (val) {
+            if (val === undefined) {
+                return checked;
+            } else {
+                checked = val;
+                return checkBox;
+            }
+        }
+        checkBox.clickEvent = function (val) {
+            clickEvent = val;
+            return checkBox;
+        }
+        return checkBox;
+    }
+
+    /*
+     * Global Variables
+     */
+    var checkboxVals = ["pictar", "rna22"];
+    var singleVal = true;
 
     function drawGraph() {
         /*
          * clean up previous svg
          */
-        d3.select("svg").remove();
+        d3.selectAll("svg").remove();
         /*
          * configure svg settings
          */
         var width = window.innerWidth,
-            height = (80 * window.innerHeight)/100;
-        
+            height = (80 * window.innerHeight) / 100;
+
+        var pic = d3.select("#graph").append("svg")
+            .attr("width", width).attr("height", 30);
+        var checkBox1 = new drawCheckBox();
+        checkBox1.checked(singleVal);
+        var update = function () {
+            var checked1 = checkBox1.checked();
+            if (checked1) {
+                checkboxVals.push("rna22");
+                singleVal = !singleVal;
+                d3.select("svg").remove();
+                drawGraph();
+            } else {
+                var spliceVal = checkboxVals.indexOf("rna22");
+                if (spliceVal > -1)
+                    checkboxVals.splice(spliceVal, 1);
+                singleVal = !singleVal;
+                d3.select("svg").remove();
+                drawGraph();
+            }
+            txt.text(checked1);
+        };
+        checkBox1.clickEvent(update);
+        pic.call(checkBox1);
+
+
         var force = d3.layout.force()
             .charge(-200).linkDistance(30).size([width, height]);
         /*
@@ -34,13 +127,6 @@ $(function () {
                 alert("Error, no JSON file found!");
                 return;
             }
-
-
-            var checkboxVals = [];
-            $("#checkbox :checked").each(function () {
-                checkboxVals.push($(this).val());
-            });
-
 
             var nodes = new Array();
             var links = new Array();
@@ -154,7 +240,4 @@ $(function () {
         return false;
     }
     $("#search").submit(drawGraph);
-    $("#checkbox").change(function () {
-        drawGraph();
-    });
 })

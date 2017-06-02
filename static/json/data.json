@@ -43,26 +43,5 @@
     }, {
             "label": "DNA",
             "title": "Target4"
-    }],
-    "links": [{
-        "source": 0,
-        "target": 4,
-        "type": "rna22"
-    }, {
-        "source": 1,
-        "target": 5,
-        "type": "pictar"
-    }, {
-        "source": 2,
-        "target": 6,
-        "type": "rna22"
-    }, {
-        "source": 3,
-        "target": 7,
-        "type": "pictar"
-    }, {
-        "source": 0,
-        "target": 6,
-        "type": "rna22"
     }]
 }
