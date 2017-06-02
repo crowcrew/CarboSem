@@ -12,8 +12,9 @@ $(function () {
 
         var side = 20,
             x = 5,
-            y = 5,
+            y = 7,
             checked = true,
+            checkboxText = "",
             clickEvent;
 
         function checkBox(parent) {
@@ -30,16 +31,22 @@ $(function () {
                     "fill-opacity": 0,
                     "stroke-width": 5,
                     "stroke": "black"
-                });
-
-            var mark = g.append("circle")
+                }),
+                mark = g.append("circle")
                 .attr("cx", x + side / 2)
                 .attr("cy", y + side / 2)
                 .attr("r", 5)
                 .style({
                     "fill": (checked) ? "#000" : "#FFF",
                     "stroke-width": 2
-                });
+                }),
+                checkboxTextArea = g.append("text")
+                .attr("x", x + side + 5)
+                .attr("y", y + side / 2 + 5)
+                .attr("font-family", "monospace")
+                .attr("font-size", "10px")
+                .attr("fill", "black")
+                .text(checkboxText);
 
             g.on("click", function () {
                 checked = !checked;
@@ -47,6 +54,10 @@ $(function () {
                 if (clickEvent)
                     clickEvent();
             });
+        }
+        checkBox.checkboxText = function (val) {
+            checkboxText = val;
+            return checkBox;
         }
         checkBox.x = function (val) {
             x = val;
@@ -74,8 +85,8 @@ $(function () {
     /*
      * Global Variables
      */
-    var checkboxVals = ["pictar", "rna22"];
-    var singleVal = true;
+    var checkboxVals = ["rna22", "pictar"];
+    var checkboxStates = [true, true];
 
     function drawGraph() {
         /*
@@ -88,29 +99,49 @@ $(function () {
         var width = window.innerWidth,
             height = (80 * window.innerHeight) / 100;
 
-        var pic = d3.select("#graph").append("svg")
+        var checkboxArea = d3.select("#graph").append("svg")
             .attr("width", width).attr("height", 30);
-        var checkBox1 = new drawCheckBox();
-        checkBox1.checked(singleVal);
-        var update = function () {
-            var checked1 = checkBox1.checked();
-            if (checked1) {
+
+        var rna22Checkbox = new drawCheckBox();
+        rna22Checkbox.x(5).checkboxText("RNA22").checked(checkboxStates[0]);
+        var rna22Update = function () {
+            var rna22Checked = rna22Checkbox.checked();
+            if (rna22Checked) {
                 checkboxVals.push("rna22");
-                singleVal = !singleVal;
-                d3.select("svg").remove();
+                checkboxStates[0] = !checkboxStates[0];
                 drawGraph();
             } else {
                 var spliceVal = checkboxVals.indexOf("rna22");
                 if (spliceVal > -1)
                     checkboxVals.splice(spliceVal, 1);
-                singleVal = !singleVal;
+                checkboxStates[0] = !checkboxStates[0];
+                drawGraph();
+            }
+        };
+        rna22Checkbox.clickEvent(rna22Update);
+
+        var pictarCheckbox = new drawCheckBox();
+        pictarCheckbox.x(75).checkboxText("PicTar").checked(checkboxStates[1]);
+        var pictarUpdate = function () {
+            var pictarChecked = pictarCheckbox.checked();
+            if (pictarChecked) {
+                checkboxVals.push("pictar");
+                checkboxStates[1] = !checkboxStates[1];
+                d3.select("svg").remove();
+                drawGraph();
+            } else {
+                var spliceVal = checkboxVals.indexOf("pictar");
+                if (spliceVal > -1)
+                    checkboxVals.splice(spliceVal, 1);
+                checkboxStates[1] = !checkboxStates[1];
                 d3.select("svg").remove();
                 drawGraph();
             }
-            txt.text(checked1);
         };
-        checkBox1.clickEvent(update);
-        pic.call(checkBox1);
+        pictarCheckbox.clickEvent(pictarUpdate);
+
+        checkboxArea.call(rna22Checkbox);
+        checkboxArea.call(pictarCheckbox);
 
 
         var force = d3.layout.force()
@@ -177,8 +208,10 @@ $(function () {
                 .data(localGraph.links);
             link.enter().append("line")
                 .attr("class", "link")
-                .style("stroke", "#2e8540")
-                .style("stroke-width", 1);
+                .style({
+                    "stroke": "#2e8540",
+                    "stroke-width": 1
+                });
             link.exit().remove();
 
             var node = svg.selectAll("node")
@@ -192,8 +225,10 @@ $(function () {
                     if (d.label == "microRNA") return "#112e51";
                     else return "#e31c3d";
                 })
-                .style("stroke", "#2e8540")
-                .style("stroke-width", 2)
+                .style({
+                    "stroke": "#2e8540",
+                    "stroke-width": 2
+                })
                 .call(force.drag);
             node.exit().remove();
 
