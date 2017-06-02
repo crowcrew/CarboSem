@@ -8,14 +8,21 @@ $(function () {
      * $.get("/graph?mir=" + encodeURIComponent(query));
      */
 
+    /*
+     * Global Variables (YUI Module Variables)
+     */
+    var checkboxVals = ["rna22", "pictar"];
+    var checkboxStates = [true, true];
+
     function drawCheckBox() {
 
         var side = 20,
             x = 5,
             y = 7,
+            checkboxVal,
             checked = true,
             checkboxText = "",
-            clickEvent;
+            checkboxNumber;
 
         function checkBox(parent) {
 
@@ -51,12 +58,29 @@ $(function () {
             g.on("click", function () {
                 checked = !checked;
                 mark.style("fill", (checked) ? "#000" : "#FFF");
-                if (clickEvent)
-                    clickEvent();
+                if (checked) {
+                    checkboxVals.push(checkboxVal);
+                    checkboxStates[checkboxNumber] = !checkboxStates[checkboxNumber];
+                    drawGraph();
+                } else {
+                    var spliceVal = checkboxVals.indexOf(checkboxVal);
+                    if (spliceVal > -1)
+                        checkboxVals.splice(spliceVal, 1);
+                    checkboxStates[checkboxNumber] = !checkboxStates[checkboxNumber];
+                    drawGraph();
+                }
             });
         }
         checkBox.checkboxText = function (val) {
             checkboxText = val;
+            return checkBox;
+        }
+        checkBox.checkboxVal = function (val) {
+            checkboxVal = val;
+            return checkBox;
+        }
+        checkBox.checkboxNumber = function (val) {
+            checkboxNumber = val;
             return checkBox;
         }
         checkBox.x = function (val) {
@@ -75,18 +99,9 @@ $(function () {
                 return checkBox;
             }
         }
-        checkBox.clickEvent = function (val) {
-            clickEvent = val;
-            return checkBox;
-        }
         return checkBox;
     }
 
-    /*
-     * Global Variables
-     */
-    var checkboxVals = ["rna22", "pictar"];
-    var checkboxStates = [true, true];
 
     function drawGraph() {
         /*
@@ -103,42 +118,11 @@ $(function () {
             .attr("width", width).attr("height", 30);
 
         var rna22Checkbox = new drawCheckBox();
-        rna22Checkbox.x(5).checkboxText("RNA22").checked(checkboxStates[0]);
-        var rna22Update = function () {
-            var rna22Checked = rna22Checkbox.checked();
-            if (rna22Checked) {
-                checkboxVals.push("rna22");
-                checkboxStates[0] = !checkboxStates[0];
-                drawGraph();
-            } else {
-                var spliceVal = checkboxVals.indexOf("rna22");
-                if (spliceVal > -1)
-                    checkboxVals.splice(spliceVal, 1);
-                checkboxStates[0] = !checkboxStates[0];
-                drawGraph();
-            }
-        };
-        rna22Checkbox.clickEvent(rna22Update);
+        rna22Checkbox.x((width-70) / 2).checkboxVal("rna22").checkboxText("RNA22").checkboxNumber(0).checked(checkboxStates[0]);
 
         var pictarCheckbox = new drawCheckBox();
-        pictarCheckbox.x(75).checkboxText("PicTar").checked(checkboxStates[1]);
-        var pictarUpdate = function () {
-            var pictarChecked = pictarCheckbox.checked();
-            if (pictarChecked) {
-                checkboxVals.push("pictar");
-                checkboxStates[1] = !checkboxStates[1];
-                d3.select("svg").remove();
-                drawGraph();
-            } else {
-                var spliceVal = checkboxVals.indexOf("pictar");
-                if (spliceVal > -1)
-                    checkboxVals.splice(spliceVal, 1);
-                checkboxStates[1] = !checkboxStates[1];
-                d3.select("svg").remove();
-                drawGraph();
-            }
-        };
-        pictarCheckbox.clickEvent(pictarUpdate);
+        pictarCheckbox.x((width-70) / 2 + 70).checkboxVal("pictar").checkboxText("PicTar").checkboxNumber(1).checked(checkboxStates[1]);
+
 
         checkboxArea.call(rna22Checkbox);
         checkboxArea.call(pictarCheckbox);
@@ -149,7 +133,7 @@ $(function () {
         /*
          * create new svg
          */
-        var svg = d3.select("#graph").append("svg")
+        var graphArea = d3.select("#graph").append("svg")
             .attr("width", width).attr("height", height)
             .attr("pointer-events", "all");
 
@@ -204,7 +188,7 @@ $(function () {
             force.nodes(localGraph.nodes).links(localGraph.links).start();
 
 
-            var link = svg.selectAll("link")
+            var link = graphArea.selectAll("link")
                 .data(localGraph.links);
             link.enter().append("line")
                 .attr("class", "link")
@@ -214,7 +198,7 @@ $(function () {
                 });
             link.exit().remove();
 
-            var node = svg.selectAll("node")
+            var node = graphArea.selectAll("node")
                 .data(localGraph.nodes);
             node.enter().append("circle")
                 .attr("class", function (d) {
@@ -223,7 +207,8 @@ $(function () {
                 .attr("r", 10)
                 .attr("fill", function (d) {
                     if (d.label == "microRNA") return "#112e51";
-                    else return "#e31c3d";
+                    else if (d.label == "DNA") return "#e31c3d";
+                    else return "#fdb81e";
                 })
                 .style({
                     "stroke": "#2e8540",
@@ -232,7 +217,7 @@ $(function () {
                 .call(force.drag);
             node.exit().remove();
 
-            var nodeText = svg.selectAll("text")
+            var nodeText = graphArea.selectAll("text")
                 .data(localGraph.nodes);
             nodeText.enter().append("text")
                 .attr("font-family", "monospace")
