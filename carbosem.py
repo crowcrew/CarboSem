@@ -10,6 +10,10 @@ def get_index():
 def css(filename):
     return static_file(filename, root='static/css')
 
+@route('/static/image/<filename>')
+def image(filename):
+    return static_file(filename, root='static/image')
+
 @route('/static/js/<filename>')
 def js(filename):
     return static_file(filename, root='static/js')
