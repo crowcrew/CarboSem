@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text/css" rel="stylesheet" href="static/css/bootstrap.css">
-    <link type="text/css" rel="stylesheet" href="static/css/CarboSem.css">
+    <link type="text/css" rel="stylesheet" href="static/css/carbosem.css">
     <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="static/js/d3.v3.min.js"></script>
-    <script type="text/javascript" src="static/js/CarboSem.js"></script>
+    <script type="text/javascript" src="static/js/carbosem.js"></script>
     <title>Carbon Semantics</title>
 </head>
 
