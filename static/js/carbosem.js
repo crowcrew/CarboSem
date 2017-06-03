@@ -2,17 +2,21 @@
  * Copyright 2017 Aly Shmahell
  */
 $(function () {
-    /*
-     * TODO
-     * var query = $("#search").find("input[name=search]").val();
-     * $.get("/graph?mir=" + encodeURIComponent(query));
-     */
 
     /*
      * Global Variables (YUI Module Variables)
      */
-    var checkboxVals = ["rna22", "pictar"];
-    var checkboxStates = [true, true];
+    var checkboxVals, checkboxStates;
+
+    function submitQuery() {
+        checkboxVals = ["rna22", "pictar"];
+        checkboxStates = [true, true];
+        /*
+         * TODO
+         * var query = $("#search").find("input[name=search]").val();
+         * $.get("/graph?mir=" + encodeURIComponent(query));
+         */
+    }
 
     function drawCheckBox() {
 
@@ -118,10 +122,10 @@ $(function () {
             .attr("width", width).attr("height", 30);
 
         var rna22Checkbox = new drawCheckBox();
-        rna22Checkbox.x((width-70) / 2).checkboxVal("rna22").checkboxText("RNA22").checkboxNumber(0).checked(checkboxStates[0]);
+        rna22Checkbox.x((width - 70) / 2).checkboxVal("rna22").checkboxText("RNA22").checkboxNumber(0).checked(checkboxStates[0]);
 
         var pictarCheckbox = new drawCheckBox();
-        pictarCheckbox.x((width-70) / 2 + 70).checkboxVal("pictar").checkboxText("PicTar").checkboxNumber(1).checked(checkboxStates[1]);
+        pictarCheckbox.x((width - 70) / 2 + 70).checkboxVal("pictar").checkboxText("PicTar").checkboxNumber(1).checked(checkboxStates[1]);
 
 
         checkboxArea.call(rna22Checkbox);
@@ -259,5 +263,6 @@ $(function () {
         });
         return false;
     }
+    $("#search").submit(submitQuery);
     $("#search").submit(drawGraph);
 })
