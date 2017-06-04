@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: http://ogp.me/ns#">
 
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,11 @@
     <link type="text/css" rel="stylesheet" href="static/css/carbosem.css">
     <link rel="shortcut icon" href="static/image/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="static/image/favicon.ico" type="image/x-icon" />
+    <meta property="og:title" content="CarboSem" />
+    <meta property="og:description" content="Carbon Semantics" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://carbosem.herokuapp.com/" />
+    <meta property="og:image" content="static/image/logo.png" />
     <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="static/js/d3.v3.min.js"></script>
     <script type="text/javascript" src="static/js/carbosem.js"></script>

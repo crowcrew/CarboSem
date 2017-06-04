@@ -6,11 +6,14 @@ $(function () {
     /*
      * Global Variables (YUI Module Variables)
      */
-    var checkboxVals, checkboxStates;
+    var checkboxVals,
+        checkboxStates,
+        checkboxValsAll;
 
     function submitQuery() {
-        checkboxVals = ["rna22", "pictar"];
-        checkboxStates = [true, true];
+        checkboxVals = [];
+        checkboxStates = [];
+        checkboxValsAll = [];
         /*
          * TODO
          * var query = $("#search").find("input[name=search]").val();
@@ -108,44 +111,55 @@ $(function () {
 
 
     function drawGraph() {
-        /*
-         * clean up previous svg
-         */
-        d3.selectAll("svg").remove();
-        /*
-         * configure svg settings
-         */
-        var width = window.innerWidth,
-            height = (80 * window.innerHeight) / 100;
-
-        var checkboxArea = d3.select("#graph").append("svg")
-            .attr("width", width).attr("height", 30);
-
-        var rna22Checkbox = new drawCheckBox();
-        rna22Checkbox.x((width - 70) / 2).checkboxVal("rna22").checkboxText("RNA22").checkboxNumber(0).checked(checkboxStates[0]);
-
-        var pictarCheckbox = new drawCheckBox();
-        pictarCheckbox.x((width - 70) / 2 + 70).checkboxVal("pictar").checkboxText("PicTar").checkboxNumber(1).checked(checkboxStates[1]);
-
-
-        checkboxArea.call(rna22Checkbox);
-        checkboxArea.call(pictarCheckbox);
-
-
-        var force = d3.layout.force()
-            .charge(-200).linkDistance(30).size([width, height]);
-        /*
-         * create new svg
-         */
-        var graphArea = d3.select("#graph").append("svg")
-            .attr("width", width).attr("height", height)
-            .attr("pointer-events", "all");
 
         d3.json("/getJSON", function (error, graph) {
             if (error) {
                 alert("Error, no JSON file found!");
                 return;
             }
+
+            /*
+             * clean up previous svg
+             */
+            d3.selectAll("svg").remove();
+            /*
+             * configure svg settings
+             */
+            var width = window.innerWidth,
+                height = (80 * window.innerHeight) / 100;
+
+            var checkboxArea = d3.select("#graph").append("svg")
+                .attr("width", width).attr("height", 30);
+
+            if (checkboxStates.length == 0)
+                for (var i = 0; i < graph.nodes.length; i++) {
+                    if (graph.nodes[i].targets)
+                        for (var j = 0; j < graph.nodes[i].targets.length; j++) {
+                            var pushState = checkboxValsAll.indexOf(graph.nodes[i].targets[j].type);
+                            if (pushState == -1) {
+                                checkboxValsAll.push(graph.nodes[i].targets[j].type);
+                                checkboxVals.push(graph.nodes[i].targets[j].type);
+                                checkboxStates.push(true);
+                            }
+                        }
+                }
+
+            var checkboxArray = new Array();
+            for (var i = 0; i < checkboxStates.length; i++) {
+                checkboxArray.push(new drawCheckBox());
+                checkboxArray[i].x((width - (35 * checkboxStates.length)) / 2 + i * 70).checkboxVal(checkboxValsAll[i]).checkboxText(checkboxValsAll[i]).checkboxNumber(i).checked(checkboxStates[i]);
+                checkboxArea.call(checkboxArray[i]);
+            }
+
+            var force = d3.layout.force()
+                .charge(-200).linkDistance(30).size([width, height]);
+            /*
+             * create new svg
+             */
+            var graphArea = d3.select("#graph").append("svg")
+                .attr("width", width).attr("height", height)
+                .attr("pointer-events", "all");
+
 
             var nodes = new Array();
             var links = new Array();
@@ -157,15 +171,15 @@ $(function () {
                     });
                     var source = nodes.length - 1;
                     for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                        var checkboxIncrement = 0;
+                        var nodeValidity = 0;
                         var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
                         if (checkboxIndex < 0)
                             continue;
                         else
-                            checkboxIncrement++;
+                            nodeValidity++;
                         nodeIndex = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
                         var target;
-                        if (nodeIndex > 0) {
+                        if (nodeIndex > -1) {
                             target = nodeIndex;
                         } else {
                             nodes.push({
@@ -179,7 +193,7 @@ $(function () {
                             "target": target
                         });
                     }
-                    if (checkboxIncrement == 0)
+                    if (nodeValidity == 0)
                         nodes.pop();
                 }
             }
