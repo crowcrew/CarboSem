@@ -1,19 +1,51 @@
 /*
- * Copyright 2017 Aly Shmahell
- */
+MIT License
+
+Copyright (c) 2017 Aly Shmahell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 $(function () {
+    function indexToRGB(index) {
+        var hash = ((index + 1) * 400) % 0x00FFFFFF;
+        for (var i = 0; i < 3; i++) {
+            hash <<= 5;
+            hash += (index + 1) * 400;
+        }
+        var hex = (hash & 0x00FFFFFF)
+            .toString(16)
+            .toUpperCase();
+        return "#" + "000000".substring(0, 6 - hex.length) + hex;
+    }
 
     /*
      * Global Variables (YUI Module Variables)
      */
-    var checkboxVals,
-        checkboxStates,
-        checkboxValsAll;
+    var checkboxStates,
+        checkboxVals,
+        checkboxColors;
 
     function submitQuery() {
-        checkboxVals = [];
         checkboxStates = [];
-        checkboxValsAll = [];
+        checkboxVals = [];
+        checkboxColors = [];
         /*
          * TODO
          * var query = $("#search").find("input[name=search]").val();
@@ -21,93 +53,6 @@ $(function () {
          */
     }
 
-    function drawCheckBox() {
-
-        var side = 20,
-            x = 5,
-            y = 7,
-            checkboxVal,
-            checked = true,
-            checkboxText = "",
-            checkboxNumber;
-
-        function checkBox(parent) {
-
-            var g = parent.append("g"),
-                box = g.append("rect")
-                .attr("width", side)
-                .attr("height", side)
-                .attr("x", x)
-                .attr("y", y)
-                .attr("rx", 6)
-                .attr("ry", 6)
-                .style({
-                    "fill-opacity": 0,
-                    "stroke-width": 5,
-                    "stroke": "black"
-                }),
-                mark = g.append("circle")
-                .attr("cx", x + side / 2)
-                .attr("cy", y + side / 2)
-                .attr("r", 5)
-                .style({
-                    "fill": (checked) ? "#000" : "#FFF",
-                    "stroke-width": 2
-                }),
-                checkboxTextArea = g.append("text")
-                .attr("x", x + side + 5)
-                .attr("y", y + side / 2 + 5)
-                .attr("font-family", "monospace")
-                .attr("font-size", "10px")
-                .attr("fill", "black")
-                .text(checkboxText);
-
-            g.on("click", function () {
-                checked = !checked;
-                mark.style("fill", (checked) ? "#000" : "#FFF");
-                if (checked) {
-                    checkboxVals.push(checkboxVal);
-                    checkboxStates[checkboxNumber] = !checkboxStates[checkboxNumber];
-                    drawGraph();
-                } else {
-                    var spliceVal = checkboxVals.indexOf(checkboxVal);
-                    if (spliceVal > -1)
-                        checkboxVals.splice(spliceVal, 1);
-                    checkboxStates[checkboxNumber] = !checkboxStates[checkboxNumber];
-                    drawGraph();
-                }
-            });
-        }
-        checkBox.checkboxText = function (val) {
-            checkboxText = val;
-            return checkBox;
-        }
-        checkBox.checkboxVal = function (val) {
-            checkboxVal = val;
-            return checkBox;
-        }
-        checkBox.checkboxNumber = function (val) {
-            checkboxNumber = val;
-            return checkBox;
-        }
-        checkBox.x = function (val) {
-            x = val;
-            return checkBox;
-        }
-        checkBox.y = function (val) {
-            y = val;
-            return checkBox;
-        }
-        checkBox.checked = function (val) {
-            if (val === undefined) {
-                return checked;
-            } else {
-                checked = val;
-                return checkBox;
-            }
-        }
-        return checkBox;
-    }
 
 
     function drawGraph() {
@@ -122,44 +67,65 @@ $(function () {
              * clean up previous svg
              */
             d3.selectAll("svg").remove();
+            d3.selectAll("div #addedCheckbox").remove();
             /*
              * configure svg settings
              */
             var width = window.innerWidth,
-                height = (80 * window.innerHeight) / 100;
+                height = (90 * window.innerHeight) / 100;
+            var force = d3.layout.force()
+                .charge(-200).gravity(.1).linkDistance(30).size([width, height]);
 
-            var checkboxArea = d3.select("#graph").append("svg")
-                .attr("width", width).attr("height", 30);
-
+            /*
+             * checkbox
+             */
             if (checkboxStates.length == 0)
                 for (var i = 0; i < graph.nodes.length; i++) {
                     if (graph.nodes[i].targets)
                         for (var j = 0; j < graph.nodes[i].targets.length; j++) {
-                            var pushState = checkboxValsAll.indexOf(graph.nodes[i].targets[j].type);
+                            var pushState = checkboxVals.indexOf(graph.nodes[i].targets[j].type);
                             if (pushState == -1) {
-                                checkboxValsAll.push(graph.nodes[i].targets[j].type);
                                 checkboxVals.push(graph.nodes[i].targets[j].type);
+                                checkboxColors.push(indexToRGB(checkboxStates.length));
                                 checkboxStates.push(true);
                             }
                         }
                 }
 
-            var checkboxArray = new Array();
+            var addedCheckbox = d3.select(".form-group").append("div").attr("class", "checkbox").attr("id", "addedCheckbox");
+            var addedLabels = [];
+            var addedBoxes = [];
             for (var i = 0; i < checkboxStates.length; i++) {
-                checkboxArray.push(new drawCheckBox());
-                checkboxArray[i].x((width - (35 * checkboxStates.length)) / 2 + i * 70).checkboxVal(checkboxValsAll[i]).checkboxText(checkboxValsAll[i]).checkboxNumber(i).checked(checkboxStates[i]);
-                checkboxArea.call(checkboxArray[i]);
+                addedLabels[i] = addedCheckbox.append("label").attr("for", checkboxVals[i]).text(checkboxVals[i])
+                    .style({
+                        "color": checkboxColors[i]
+                    });
+                addedBoxes[i] = addedCheckbox.append("input")
+                    .attr("type", "checkbox")
+                    .attr("name", "function")
+                    .attr("value", checkboxVals[i])
+                    .attr("id", checkboxVals[i])
+                    .style({
+                        opacity: 0
+                    })
+                    .property("checked", checkboxStates[i]);
             }
+            addedCheckbox.on("change", function () {
+                for (var i = 0; i < checkboxStates.length; i++) {
+                    checkboxStates[i] = addedBoxes[i].property("checked");
+                    checkboxColors[i] = checkboxStates[i] ? indexToRGB(i) : "#FFFFFF";
+                }
+                drawGraph();
+            });
 
-            var force = d3.layout.force()
-                .charge(-200).linkDistance(30).size([width, height]);
             /*
              * create new svg
              */
             var graphArea = d3.select("#graph").append("svg")
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 800 600")
                 .attr("width", width).attr("height", height)
                 .attr("pointer-events", "all");
-
 
             var nodes = new Array();
             var links = new Array();
@@ -173,7 +139,8 @@ $(function () {
                     for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
                         var nodeValidity = 0;
                         var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
-                        if (checkboxIndex < 0)
+                        var checkboxIndexValidity = checkboxStates[checkboxIndex];
+                        if (!checkboxIndexValidity)
                             continue;
                         else
                             nodeValidity++;
@@ -190,7 +157,8 @@ $(function () {
                         }
                         links.push({
                             "source": source,
-                            "target": target
+                            "target": target,
+                            "type": graph.nodes[i].targets[j].type
                         });
                     }
                     if (nodeValidity == 0)
@@ -211,8 +179,10 @@ $(function () {
             link.enter().append("line")
                 .attr("class", "link")
                 .style({
-                    "stroke": "#2e8540",
-                    "stroke-width": 1
+                    "stroke": function (d) {
+                        return checkboxColors[checkboxVals.findIndex(x => x == d.type)]
+                    },
+                    "stroke-width": 3
                 });
             link.exit().remove();
 
@@ -226,10 +196,11 @@ $(function () {
                 .attr("fill", function (d) {
                     if (d.label == "microRNA") return "#112e51";
                     else if (d.label == "DNA") return "#e31c3d";
+                    else if (d.label == "pathway") return "#0C9920";
                     else return "#fdb81e";
                 })
                 .style({
-                    "stroke": "#2e8540",
+                    "stroke": "floralwhite",
                     "stroke-width": 2
                 })
                 .call(force.drag);
@@ -279,4 +250,5 @@ $(function () {
     }
     $("#search").submit(submitQuery);
     $("#search").submit(drawGraph);
+    $(window).resize(drawGraph);
 })

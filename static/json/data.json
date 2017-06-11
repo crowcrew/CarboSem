@@ -10,7 +10,7 @@
                 "type": "rna22"
             }]
     }, {
-            "label": "Pathway",
+            "label": "pathway",
             "title": "PW0",
             "targets": [{
                 "target": 0,
