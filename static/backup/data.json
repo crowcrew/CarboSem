@@ -1,0 +1,54 @@
+{
+    "nodes": [{
+            "label": "microRNA",
+            "title": "Mir1",
+            "targets": [{
+                "target": 5,
+                "type": "rna22"
+            }, {
+                "target": 7,
+                "type": "rna22"
+            }]
+    }, {
+            "label": "pathway",
+            "title": "PW0",
+            "targets": [{
+                "target": 0,
+                "type": "PAth"
+            }]
+    }, {
+            "label": "microRNA",
+            "title": "Mir2",
+            "targets": [{
+                "target": 6,
+                "type": "pictar"
+            }]
+    }, {
+            "label": "microRNA",
+            "title": "Mir3",
+            "targets": [{
+                "target": 7,
+                "type": "rna22"
+            }]
+    }, {
+            "label": "microRNA",
+            "title": "Mir4",
+            "targets": [{
+                "target": 8,
+                "type": "pictar"
+            }]
+    },
+        {
+            "label": "DNA",
+            "title": "Target1"
+    }, {
+            "label": "DNA",
+            "title": "Target2"
+    }, {
+            "label": "DNA",
+            "title": "Target3"
+    }, {
+            "label": "DNA",
+            "title": "Target4"
+    }]
+}

@@ -1,0 +1,48 @@
+This Software Development Agreement states the terms and conditions that govern the contractual agreement between the developer: CarboSem (Carbon Semantics), and the client: the DIANA project (Data science analysis to determine the Influence of multiple conjoint mirnAs on caNcer diseAse).
+
+Whereas, the client has conceptualized a webapp that acts as a user interface for the representation of relations between biological data, and the developer is a contractor with whom the client has come to an agreement to develop the software.
+
+Software Specifications:
+The software acts as a user interface hosted on the client's server(s), the software expects to integrate and communicate with 3rd party software on the client's server(s) to deliver the ultimate required functionality.
+The software provides an interface for a user to input names of sequences (DNA, MicroRNA, Pathways, Disease), the input data is then submitted to 3rd party software on the client's server(s) to be queried.
+The result of the query is expected to return as a JSON file according to the specifications layered by the developer (in Appendix A).
+The software provides a dynamic interface to visualise the returned JSON file.
+The dynamic interface of the software converts the data in the JSON file to checkboxes, nodes, relations and a description area, accordingly and without alteration.
+
+The Developer:
+The developer, named CarboSem, is a team of students at the bachelor level taking the class of bioinformatics 2017 as part of the computer science program at University of L'Aquila.
+Team Members are (in alphabetical order): Aly Shmahell, Carlo Attardi, Dima Mhrez.
+
+Licensing:
+The client shall respect the licenses included in the software, be it the general license file that covers all files without an embedded license, or be it embedded licenses that cover the files they are embedded in.
+The client is allowed and expected to remove one license notice only, which is the footer copyright notice inside the file: index.tpl, only in case said file was used in the software's deployment.
+
+Appendix A:
+
+**Beginning of Appendix A**
+
+JSON file structure:
+{
+ "nodes":[
+         {
+          "label":"",
+          "title":"",
+          "targets":[
+                     {
+                      "target":,
+                      "type":""
+                     }
+                    ]
+          }
+          ]
+}
+
+JSON file name:
+data.json
+
+JSON file location:
+carbosem/static/json
+
+**End of Appendix A**
+
+Date: 09 - June - 2017
