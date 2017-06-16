@@ -7,6 +7,7 @@ demo="./demo_path/"
 make_converter() construct a converter and converts a json from db to a json for CarboSem
 """
 converter = CarboSem_JSON_converter.make_converter(demo+"neo4j_JSONs/result.json", demo+"static/json/data.json")
+converter.convert_to_carbosem()
 
 """
 manual change of attributes and conversion of the file pointed from first

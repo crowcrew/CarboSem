@@ -3,11 +3,12 @@ import json
 
 
 class CarboSem_JSON_converter(object):
-    jsonDB = ""
-    jsonCarboSem = ""
+    jsonDB = None
+    jsonCarboSem = None
 
     def __init__(self, jsonFileToConvert, jsonFileToSend):
-        self.change_files_and_convert(jsonFileToConvert, jsonFileToSend)
+        self.jsonDB = jsonFileToConvert
+        self.jsonCarboSem = jsonFileToSend
 
     def change_files_and_convert(self, jsonFileToConvert, jsonFileToSend):
         self.jsonDB = jsonFileToConvert
@@ -46,4 +47,5 @@ def make_converter(jsonFileToConvert, jsonFileToSend):
 
 
 def simple_conversion(jsonFileToConvert, jsonFileToSend):
-    CarboSem_JSON_converter(jsonFileToConvert, jsonFileToSend)
+    converter = CarboSem_JSON_converter(jsonFileToConvert, jsonFileToSend)
+    converter.convert_to_carbosem()
