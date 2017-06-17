@@ -12,8 +12,9 @@ for j in range(0,10):
 	for i in range (0,random.randint(100,1000)):
 		targets =[]
 		for i in range(0,random.randint(1,3)):
-			targets.append({"target":random.randint(0,3),"type":types[random.randint(0,3)]})
-		nodes.append({"label":labels[random.randint(0,3)],"title":labels[random.randint(0,3)]+str(i),"targets":targets})
+			targets.append({"target":random.randint(1,3),"type":types[random.randint(0,3)]})
+		nodePar = labels[random.randint(0,3)]
+		nodes.append({"label":nodePar,"title":nodePar+str(i),"targets":targets})
 
 	jsoncon={"nodes":nodes}
 
