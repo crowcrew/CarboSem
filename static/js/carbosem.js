@@ -23,21 +23,6 @@ SOFTWARE.
 */
 
 $(function () {
-    function indexToRGB(index) {
-        var hash = ((index + 1) * 400) % 0x00FFFFFF;
-        for (var i = 0; i < 3; i++) {
-            hash <<= 5;
-            hash += (index + 1) * 400;
-        }
-        var hex = (hash & 0x00FFFFFF);
-        if (hex < 5000000)
-            hex += 5909090;
-        hex = hex
-            .toString(16)
-            .toUpperCase();
-
-        return "#" + "000000".substring(0, 6 - hex.length) + hex;
-    }
 
     /*
      * Global Variables (YUI Module Variables)
@@ -48,12 +33,19 @@ $(function () {
         ledgerElements,
         ledgerColors;
 
+    /*
+     * defining color arrays
+     */
+    var linkColor = d3.scaleOrdinal(d3.schemeCategory10);
+    var nodeColor = d3.scaleOrdinal(d3.schemeCategory20);
+
     function submitQuery() {
+        /*
+         * resetting the checkbox area
+         */
         checkboxStates = [];
         checkboxVals = [];
         checkboxColors = [];
-        ledgerElements = [];
-        ledgerColors = [];
         /*
          * TODO
          * var query = $("#search").find("input[name=search]").val();
@@ -64,6 +56,11 @@ $(function () {
 
 
     function drawGraph() {
+        /*
+         * resetting the ledger area
+         */
+        ledgerElements = [];
+        ledgerColors = [];
 
         d3.json("/getJSON", function (error, graph) {
             if (error) {
@@ -72,21 +69,13 @@ $(function () {
             }
 
             /*
-             * clean up previous svg
+             * cleaning up previously rendered checkboxes and ledger elements
              */
-            d3.selectAll("svg").remove();
             d3.selectAll("div #addedCheckbox").remove();
             d3.selectAll("div #addedLedger").remove();
-            /*
-             * configure svg settings
-             */
-            var width = window.innerWidth,
-                height = (90 * window.innerHeight) / 100;
-            var force = d3.layout.force()
-                .charge(-200).gravity(.1).linkDistance(30).size([width, height]);
 
             /*
-             * checkbox
+             * initiating checkboxes after submitting a new query
              */
             if (checkboxStates.length == 0)
                 for (var i = 0; i < graph.nodes.length; i++) {
@@ -95,57 +84,43 @@ $(function () {
                             var pushState = checkboxVals.indexOf(graph.nodes[i].targets[j].type);
                             if (pushState == -1) {
                                 checkboxVals.push(graph.nodes[i].targets[j].type);
-                                checkboxColors.push(indexToRGB(checkboxStates.length));
                                 checkboxStates.push(true);
+                                checkboxColors.push(linkColor(checkboxStates.length - 1));
                             }
                         }
                 }
-
+            /*
+             * rendering checkboxes as per their current states
+             */
             var addedCheckbox = d3.select(".form-group").append("div").attr("class", "checkbox").attr("id", "addedCheckbox");
             var addedLabels = [];
             var addedBoxes = [];
             var beginCheckbox = addedCheckbox.append("label").text("{")
-                .style({
-                    "color": "floaralwhite",
-                    "padding-right": "10px"
-                });
+                .style("color", "floralwhite").style("padding-right", "10px");
             for (var i = 0; i < checkboxStates.length; i++) {
                 addedLabels[i] = addedCheckbox.append("label").attr("for", checkboxVals[i]).text(checkboxVals[i])
-                    .style({
-                        "color": checkboxColors[i]
-                    });
+                    .style("color", checkboxColors[i]);
                 addedBoxes[i] = addedCheckbox.append("input")
                     .attr("type", "checkbox")
                     .attr("name", "function")
                     .attr("value", checkboxVals[i])
                     .attr("id", checkboxVals[i])
-                    .style({
-                        opacity: 0
-                    })
+                    .style("opacity", 0)
                     .property("checked", checkboxStates[i]);
             }
             var endCheckbox = addedCheckbox.append("label").text("}")
-                .style({
-                    "color": "floralwhite"
-                });
+                .style("color", "floralwhite");
             addedCheckbox.on("change", function () {
                 for (var i = 0; i < checkboxStates.length; i++) {
                     checkboxStates[i] = addedBoxes[i].property("checked");
-                    checkboxColors[i] = checkboxStates[i] ? indexToRGB(i) : "#FFFFFF";
+                    checkboxColors[i] = checkboxStates[i] ? linkColor(i) : "#FFFFFF";
                 }
                 drawGraph();
+                return;
             });
-
-
             /*
-             * create new svg
+             * creating local arrays according to checkbox states
              */
-            var graphArea = d3.select("#graph").append("svg")
-                .attr("preserveAspectRatio", "xMinYMin meet")
-                .attr("viewBox", "0 0 800 600")
-                .attr("width", width).attr("height", height)
-                .attr("pointer-events", "all");
-
             var nodes = new Array();
             var links = new Array();
             for (var i = 0, len = graph.nodes.length; i < len; i++) {
@@ -154,12 +129,11 @@ $(function () {
                         "label": graph.nodes[i].label,
                         "title": graph.nodes[i].title
                     });
-                    ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
+                    var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
                     if (ledgerIndex < 0) {
                         ledgerElements.push(graph.nodes[i].label);
-                        ledgerColors.push(indexToRGB(ledgerElements.length + checkboxColors.length));
+                        ledgerColors.push(nodeColor(ledgerElements.length - 1));
                     }
-
                     var source = nodes.length - 1;
                     for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
                         var nodeValidity = 0;
@@ -169,7 +143,7 @@ $(function () {
                             continue;
                         else
                             nodeValidity++;
-                        nodeIndex = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
+                        var nodeIndex = nodes.findIndex(x => x.title == graph.nodes[graph.nodes[i].targets[j].target].title);
                         var target;
                         if (nodeIndex > -1) {
                             target = nodeIndex;
@@ -179,6 +153,11 @@ $(function () {
                                 "title": graph.nodes[graph.nodes[i].targets[j].target].title
                             });
                             target = nodes.length - 1;
+                            var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
+                            if (ledgerIndex < 0) {
+                                ledgerElements.push(graph.nodes[graph.nodes[i].targets[j].target].label);
+                                ledgerColors.push(nodeColor(ledgerElements.length - 1));
+                            }
                         }
                         links.push({
                             "source": source,
@@ -193,108 +172,113 @@ $(function () {
                     }
                 }
             }
-
-            var addedLedger = d3.select(".form-group").append("div").attr("class", "checkbox").attr("id", "addedLedger").style({
-                "display": "inline"
-            });
-            var beginledger = addedLedger.append("label").text("{")
-                .style({
-                    "color": "floaralwhite",
-                    "padding-left": "10px"
-                });
-            var addedLedgerElements = [];
-            for (var i = 0; i < ledgerElements.length; i++) {
-                addedLedgerElements[i] = addedLedger.append("label").text(ledgerElements[i] + (i < ledgerElements.length - 1 ? ", " : "")).style({
-                    "color": ledgerColors[i]
-                });
+            /*
+             * rendering ledger elements as per their current states
+             */
+            if (ledgerElements.length > 0) {
+                var addedLedger = d3.select(".form-group").append("div").attr("class", "checkbox").attr("id", "addedLedger").style(
+                    "display", "inline");
+                var beginledger = addedLedger.append("label").text("{")
+                    .style("color", "floralwhite")
+                    .style("padding-left", "10px");
+                var addedLedgerElements = [];
+                for (var i = 0; i < ledgerElements.length; i++) {
+                    addedLedgerElements[i] = addedLedger.append("label").text(ledgerElements[i] + (i < ledgerElements.length - 1 ? ", " : "")).style("color", ledgerColors[i]);
+                }
+                var endLedger = addedLedger.append("label").text("}")
+                    .style("color", "floralwhite");
             }
-            var endLedger = addedLedger.append("label").text("}")
-                .style({
-                    "color": "floralwhite"
-                });
+
+            /*
+             * pushing arrays to local graph
+             */
             var localGraph = {
                 "nodes": nodes,
                 "links": links
             };
 
-            force.nodes(localGraph.nodes).links(localGraph.links).start();
+            /*
+             * configure canvas parameters
+             */
+            var width = window.innerWidth,
+                height = (90 * window.innerHeight) / 100;
 
+            var canvas = document.querySelector("canvas"),
+                context = canvas.getContext("2d");
+            canvas.width = width;
+            canvas.height = height;
 
-            var link = graphArea.selectAll("link")
-                .data(localGraph.links);
-            link.enter().append("line")
-                .attr("class", "link")
-                .style({
-                    "stroke": function (d) {
-                        return checkboxColors[checkboxVals.findIndex(x => x == d.type)]
-                    },
-                    "stroke-width": 3
+            /*
+             * configure simulation settings
+             */
+            var simulation = d3.forceSimulation()
+                .force("link", d3.forceLink())
+                .force("charge", d3.forceManyBody())
+                .force("center", d3.forceCenter(width / 2, height / 2));
+
+            /*
+             * initiating the simulation renderer
+             */
+            simulation
+                .nodes(localGraph.nodes)
+                .on("tick", function () {
+                    context.clearRect(0, 0, width, height);
+                    localGraph.links.forEach(function (d) {
+                        context.beginPath();
+                        context.strokeStyle = checkboxColors[checkboxVals.findIndex(x => x == d.type)];
+                        context.moveTo(d.source.x, d.source.y);
+                        context.lineTo(d.target.x, d.target.y);
+                        context.stroke();
+                    });
+                    localGraph.nodes.forEach(function (d) {
+                        context.beginPath();
+                        context.fillStyle = ledgerColors[ledgerElements.findIndex(x => x == d.label)];
+                        context.moveTo(d.x, d.y);
+                        context.arc(d.x, d.y, 5, 0, 2 * Math.PI);
+                        context.fillText(d.renderedText != null ? d.renderedText : "", d.x + 5, d.y + 5);
+                        context.fill();
+                    });
                 });
-            link.exit().remove();
 
-            var node = graphArea.selectAll("node")
-                .data(localGraph.nodes);
-            node.enter().append("circle")
-                .attr("class", function (d) {
-                    return "node " + d.label
-                })
-                .attr("r", 10)
-                .attr("fill", function (d) {
-                    colorindex = ledgerElements.findIndex(x => x == d.label);
-                    return ledgerColors[colorindex];
+            simulation.force("link")
+                .links(localGraph.links);
 
-
-                })
-                .style({
-                    "stroke": "floralwhite",
-                    "stroke-width": 2
-                })
-                .call(force.drag);
-            node.exit().remove();
-
-            var nodeText = graphArea.selectAll("text")
-                .data(localGraph.nodes);
-            nodeText.enter().append("text")
-                .attr("font-family", "monospace")
-                .attr("font-size", "10px")
-                .attr("fill", "black")
-                .text(function (d) {
-                    return d.title
-                });
-            nodeText.exit().remove();
-
-            force.on("tick", function () {
-                link.attr("x1", function (d) {
-                        return d.source.x;
+            /*
+             * changing background parameters of elements as per mouse drag
+             */
+            d3.select(canvas)
+                .call(d3.drag()
+                    .container(canvas)
+                    .subject(function () {
+                        return simulation.find(d3.event.x, d3.event.y);
                     })
-                    .attr("y1", function (d) {
-                        return d.source.y;
+                    .on("start", function () {
+                        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                        d3.event.subject.fx = d3.event.subject.x;
+                        d3.event.subject.fy = d3.event.subject.y;
+                        if (d3.event.subject.renderedText)
+                            d3.event.subject.renderedText = null;
+                        else
+                            d3.event.subject.renderedText = d3.event.subject.title;
                     })
-                    .attr("x2", function (d) {
-                        return d.target.x;
+                    .on("drag", function () {
+                        d3.event.subject.fx = d3.event.x;
+                        d3.event.subject.fy = d3.event.y;
                     })
-                    .attr("y2", function (d) {
-                        return d.target.y;
-                    });
-
-                node.attr("cx", function (d) {
-                        return d.x;
-                    })
-                    .attr("cy", function (d) {
-                        return d.y;
-                    });
-
-                nodeText.attr("x", function (d) {
-                        return d.x + 10;
-                    })
-                    .attr("y", function (d) {
-                        return d.y + 10;
-                    });
-            });
+                    .on("end", function () {
+                        if (!d3.event.active) simulation.alphaTarget(0);
+                        d3.event.subject.fx = null;
+                        d3.event.subject.fy = null;
+                    }));
         });
+
         return false;
     }
+    /*
+     * calling functions according to DOM bindings
+     */
     $("#search").submit(submitQuery);
     $("#search").submit(drawGraph);
     $(window).resize(drawGraph);
+    return;
 })
