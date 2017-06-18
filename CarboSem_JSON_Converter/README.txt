@@ -8,4 +8,4 @@ in the "Entity" folder.
 The conversion takes in input a file called "result.json" into the folder "neo4j_JSON" and returns a file called "data.json"
 inside the folder ../../CarboSem/static/json/data.json (folders "CarboSem" and "CarboSem-Scripts" should be in the same folder).
 
-A demonstration script ("demo.py") explains how the "Entity/CarboSem_JSON_Converter.py" could works.
+A demonstration script ("demo.py") explains how the "Entity/CarboSem_JSON_Converter.py" could work.
