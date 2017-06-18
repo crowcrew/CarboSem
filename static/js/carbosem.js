@@ -133,7 +133,7 @@ $(function () {
                     var ledgerInsertibility = false;
                     var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
                     if (ledgerIndex < 0) {
-                        console.log("put in ledger first stage: "+graph.nodes[i].label);
+                        console.log("put in ledger first stage: " + graph.nodes[i].label);
                         ledgerElements.push(graph.nodes[i].label);
                         ledgerColors.push(nodeColor(ledgerElements.length - 1));
                         ledgerInsertibility = true;
@@ -141,7 +141,7 @@ $(function () {
                     var source = nodes.length - 1;
                     var nodeValidity = 0;
                     for (var j = 0; j < graph.nodes[i].targets.length; j++) {
-                        
+
                         var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
                         var checkboxIndexValidity = checkboxStates[checkboxIndex];
                         if (!checkboxIndexValidity)
@@ -160,7 +160,7 @@ $(function () {
                             target = nodes.length - 1;
                             var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
                             if (ledgerIndex < 0) {
-                                console.log("put in ledger second stage: "+graph.nodes[graph.nodes[i].targets[j].target].label);
+                                console.log("put in ledger second stage: " + graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerElements.push(graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerColors.push(nodeColor(ledgerElements.length - 1));
                             }
@@ -173,11 +173,10 @@ $(function () {
                     }
                     if (nodeValidity == 0) {
                         nodes.pop();
-                        if(ledgerInsertibility)
-                            {
-                                ledgerElements.pop();
-                                ledgerColors.pop();
-                            }
+                        if (ledgerInsertibility) {
+                            ledgerElements.pop();
+                            ledgerColors.pop();
+                        }
                     }
                 }
             }
@@ -221,9 +220,12 @@ $(function () {
              * configure simulation settings
              */
             var simulation = d3.forceSimulation()
-                .force("link", d3.forceLink())
+                .force("link", d3.forceLink().distance(10).strength(1))
                 .force("charge", d3.forceManyBody())
-                .force("center", d3.forceCenter(width / 2, height / 2));
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force('x', d3.forceX(width/2).strength(width>height?0.1:0.25))
+                .force('y', d3.forceY(height/2).strength(width>height?0.25:0.1));
+
 
             /*
              * initiating the simulation renderer
@@ -242,6 +244,8 @@ $(function () {
                     localGraph.nodes.forEach(function (d) {
                         context.beginPath();
                         context.fillStyle = ledgerColors[ledgerElements.findIndex(x => x == d.label)];
+                        d.x = Math.max(5, Math.min(width - 5, d.x));
+                        d.y = Math.max(5, Math.min(height - 5, d.y));
                         context.moveTo(d.x, d.y);
                         context.arc(d.x, d.y, 5, 0, 2 * Math.PI);
                         context.fillText(d.renderedText != null ? d.renderedText : "", d.x + 5, d.y + 5);
@@ -259,6 +263,7 @@ $(function () {
                 .call(d3.drag()
                     .container(canvas)
                     .subject(function () {
+                        console.log(simulation.find(d3.event.x, d3.event.y));
                         return simulation.find(d3.event.x, d3.event.y);
                     })
                     .on("start", function () {
@@ -271,8 +276,8 @@ $(function () {
                             d3.event.subject.renderedText = d3.event.subject.title;
                     })
                     .on("drag", function () {
-                        d3.event.subject.fx = d3.event.x;
-                        d3.event.subject.fy = d3.event.y;
+                        d3.event.subject.fx = Math.max(5, Math.min(width - 5, d3.event.x));
+                        d3.event.subject.fy = Math.max(5, Math.min(height - 5, d3.event.y));
                     })
                     .on("end", function () {
                         if (!d3.event.active) simulation.alphaTarget(0);

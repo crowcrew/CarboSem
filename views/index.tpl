@@ -16,7 +16,7 @@
     <meta property="og:url" content="https://carbosem.herokuapp.com/" />
     <meta property="og:image" content="static/image/logo.png" />
     <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="static/js/d3.v4.min.js"></script>
     <script type="text/javascript" src="static/js/carbosem.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.js"></script>
