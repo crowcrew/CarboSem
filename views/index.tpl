@@ -37,7 +37,7 @@
         <div class="collapse navbar-collapse" id="targetNavBar">
             <form role="search" class="navbar-form navbar-left" id="search">
                 <div class="form-group">
-                    <input type="text" value="" placeholder="Search for MicroRNA" class="form-control" name="search">
+                    <input type="text" value="" placeholder="Search for Sequences" class="form-control" name="search">
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
             </form>

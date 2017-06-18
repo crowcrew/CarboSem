@@ -123,20 +123,25 @@ $(function () {
              */
             var nodes = new Array();
             var links = new Array();
+            console.log("beginning of debugging");
             for (var i = 0, len = graph.nodes.length; i < len; i++) {
                 if (graph.nodes[i].targets) {
                     nodes.push({
                         "label": graph.nodes[i].label,
                         "title": graph.nodes[i].title
                     });
+                    var ledgerInsertibility = false;
                     var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
                     if (ledgerIndex < 0) {
+                        console.log("put in ledger first stage: "+graph.nodes[i].label);
                         ledgerElements.push(graph.nodes[i].label);
                         ledgerColors.push(nodeColor(ledgerElements.length - 1));
+                        ledgerInsertibility = true;
                     }
                     var source = nodes.length - 1;
-                    for (var j = 0, sublen = graph.nodes[i].targets.length; j < sublen; j++) {
-                        var nodeValidity = 0;
+                    var nodeValidity = 0;
+                    for (var j = 0; j < graph.nodes[i].targets.length; j++) {
+                        
                         var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
                         var checkboxIndexValidity = checkboxStates[checkboxIndex];
                         if (!checkboxIndexValidity)
@@ -155,6 +160,7 @@ $(function () {
                             target = nodes.length - 1;
                             var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
                             if (ledgerIndex < 0) {
+                                console.log("put in ledger second stage: "+graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerElements.push(graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerColors.push(nodeColor(ledgerElements.length - 1));
                             }
@@ -167,8 +173,11 @@ $(function () {
                     }
                     if (nodeValidity == 0) {
                         nodes.pop();
-                        ledgerElements.pop();
-                        ledgerColors.pop();
+                        if(ledgerInsertibility)
+                            {
+                                ledgerElements.pop();
+                                ledgerColors.pop();
+                            }
                     }
                 }
             }
