@@ -1,4 +1,4 @@
-# Copyrights 2017 Carlo Attardi
+# Copyright 2017 Carlo Attardi
 import json
 
 
