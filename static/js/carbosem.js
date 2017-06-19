@@ -123,7 +123,6 @@ $(function () {
              */
             var nodes = new Array();
             var links = new Array();
-            console.log("beginning of debugging");
             for (var i = 0, len = graph.nodes.length; i < len; i++) {
                 if (graph.nodes[i].targets) {
                     nodes.push({
@@ -133,7 +132,6 @@ $(function () {
                     var ledgerInsertibility = false;
                     var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
                     if (ledgerIndex < 0) {
-                        console.log("put in ledger first stage: " + graph.nodes[i].label);
                         ledgerElements.push(graph.nodes[i].label);
                         ledgerColors.push(nodeColor(ledgerElements.length - 1));
                         ledgerInsertibility = true;
@@ -160,7 +158,6 @@ $(function () {
                             target = nodes.length - 1;
                             var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
                             if (ledgerIndex < 0) {
-                                console.log("put in ledger second stage: " + graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerElements.push(graph.nodes[graph.nodes[i].targets[j].target].label);
                                 ledgerColors.push(nodeColor(ledgerElements.length - 1));
                             }
@@ -181,6 +178,14 @@ $(function () {
                 }
             }
             /*
+             * pushing arrays to local graph
+             */
+            var localGraph = {
+                "nodes": nodes,
+                "links": links
+            };
+
+            /*
              * rendering ledger elements as per their current states
              */
             if (ledgerElements.length > 0) {
@@ -196,14 +201,6 @@ $(function () {
                 var endLedger = addedLedger.append("label").text("}")
                     .style("color", "floralwhite");
             }
-
-            /*
-             * pushing arrays to local graph
-             */
-            var localGraph = {
-                "nodes": nodes,
-                "links": links
-            };
 
             /*
              * configure canvas parameters
@@ -223,8 +220,8 @@ $(function () {
                 .force("link", d3.forceLink().distance(10).strength(1))
                 .force("charge", d3.forceManyBody())
                 .force("center", d3.forceCenter(width / 2, height / 2))
-                .force('x', d3.forceX(width/2).strength(width>height?0.1:0.25))
-                .force('y', d3.forceY(height/2).strength(width>height?0.25:0.1));
+                .force('x', d3.forceX(width / 2).strength(width > height ? 0.1 : 0.25))
+                .force('y', d3.forceY(height / 2).strength(width > height ? 0.25 : 0.1));
 
 
             /*
@@ -263,7 +260,6 @@ $(function () {
                 .call(d3.drag()
                     .container(canvas)
                     .subject(function () {
-                        console.log(simulation.find(d3.event.x, d3.event.y));
                         return simulation.find(d3.event.x, d3.event.y);
                     })
                     .on("start", function () {
