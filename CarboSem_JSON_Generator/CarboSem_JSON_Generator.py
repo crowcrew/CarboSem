@@ -7,21 +7,20 @@ import random
 types = ["rna22","pictar","path", "dis"]
 labels=["microRNA","pathway","DNA","disease"]
 
-for j in range(0,10):
+for i in range(0,10):
 	nodes= []
-	for i in range (0,random.randint(100,1000)):
+	for j in range (0,random.randint(100,1000)):
 		targets =[]
-		for i in range(0,random.randint(1,3)):
-			targets.append({"target":random.randint(1,3),"type":types[random.randint(0,3)]})
+		if(j>4):
+			for k in range(j-4,random.randint(j-4,j-1)):
+				targets.append({"target":random.randint(0,j-1),"type":types[random.randint(0,3)]})
 		nodePar = labels[random.randint(0,3)]
-		nodes.append({"label":nodePar,"title":nodePar+str(i),"targets":targets})
+		nodes.append({"label":nodePar,"title":nodePar+str(j),"targets":targets})
 
 	jsoncon={"nodes":nodes}
 
-	with open("data"+str(j)+".json","w") as datafile:
+	with open("data"+str(i)+".json","w") as datafile:
 		json.dump(jsoncon,datafile)
-
-
 
 
 
