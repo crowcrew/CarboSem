@@ -23,8 +23,9 @@ class CarboSem_JSON_converter(object):
         nodes = []
         for i in data['data']:
             for j in i['graph']['nodes']:
-                nodes.append({"label": j['labels'][0], "title": 'Name: ' + j['properties']['name'] + ', Species: ' + j['properties']['species'] + ', Accession number: ' + j['properties']['name']})
-                assoc[j['id']] = len(nodes) - 1
+                if j['id'] not in assoc:
+                    nodes.append({"label": j['labels'][0], "title": 'Name: ' + j['properties']['name'] + ', Species: ' + j['properties']['species'] + ', Accession number: ' + j['properties']['name']})
+                    assoc[j['id']] = len(nodes) - 1
 
         for i in data['data']:
             for j in i['graph']['relationships']:
