@@ -198,9 +198,9 @@ $(function () {
                 var beginledger = addedLedger.append("label").text("{")
                     .style("color", "floralwhite")
                     .style("padding-left", "10px");
-                var addedledger = [];
+                var addedLedgerElements = [];
                 for (var i = 0; i < ledger["elements"].length; i++) {
-                    addedledger[i] = addedLedger.append("label").text(ledger["elements"][i] + (i < ledger["elements"].length - 1 ? ", " : "")).style("color", ledger["colors"][i]);
+                    addedLedgerElements[i] = addedLedger.append("label").text(ledger["elements"][i] + (i < ledger["elements"].length - 1 ? ", " : "")).style("color", ledger["colors"][i]);
                 }
                 var endLedger = addedLedger.append("label").text("}")
                     .style("color", "floralwhite");
