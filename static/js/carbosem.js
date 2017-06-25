@@ -27,11 +27,15 @@ $(function () {
     /*
      * Global Variables (YUI Module Variables)
      */
-    var checkboxStates,
-        checkboxVals,
-        checkboxColors,
-        ledgerElements,
-        ledgerColors;
+    var checkbox = {
+            "states": [],
+            "vals": [],
+            "colors": []
+        },
+        ledger = {
+            "elements": [],
+            "colors": []
+        };
 
     /*
      * defining color arrays
@@ -43,9 +47,9 @@ $(function () {
         /*
          * resetting the checkbox area
          */
-        checkboxStates = [];
-        checkboxVals = [];
-        checkboxColors = [];
+        checkbox["states"] = [];
+        checkbox["vals"] = [];
+        checkbox["colors"] = [];
         /*
          * TODO
          * var query = $("#search").find("input[name=search]").val();
@@ -59,8 +63,8 @@ $(function () {
         /*
          * resetting the ledger area
          */
-        ledgerElements = [];
-        ledgerColors = [];
+        ledger["elements"] = [];
+        ledger["colors"] = [];
 
         d3.json("/getJSON", function (error, graph) {
             if (error) {
@@ -77,15 +81,15 @@ $(function () {
             /*
              * initiating checkboxes after submitting a new query
              */
-            if (checkboxStates.length == 0)
+            if (checkbox["states"].length == 0)
                 for (var i = 0; i < graph.nodes.length; i++) {
                     if (graph.nodes[i].targets)
                         for (var j = 0; j < graph.nodes[i].targets.length; j++) {
-                            var pushState = checkboxVals.indexOf(graph.nodes[i].targets[j].type);
+                            var pushState = checkbox["vals"].indexOf(graph.nodes[i].targets[j].type);
                             if (pushState == -1) {
-                                checkboxVals.push(graph.nodes[i].targets[j].type);
-                                checkboxStates.push(true);
-                                checkboxColors.push(linkColor(checkboxStates.length - 1));
+                                checkbox["vals"].push(graph.nodes[i].targets[j].type);
+                                checkbox["states"].push(true);
+                                checkbox["colors"].push(linkColor(checkbox["states"].length - 1));
                             }
                         }
                 }
@@ -97,23 +101,23 @@ $(function () {
             var addedBoxes = [];
             var beginCheckbox = addedCheckbox.append("label").text("{")
                 .style("color", "floralwhite").style("padding-right", "10px");
-            for (var i = 0; i < checkboxStates.length; i++) {
-                addedLabels[i] = addedCheckbox.append("label").attr("for", checkboxVals[i]).text(checkboxVals[i])
-                    .style("color", checkboxColors[i]);
+            for (var i = 0; i < checkbox["states"].length; i++) {
+                addedLabels[i] = addedCheckbox.append("label").attr("for", checkbox["vals"][i]).text(checkbox["vals"][i])
+                    .style("color", checkbox["colors"][i]);
                 addedBoxes[i] = addedCheckbox.append("input")
                     .attr("type", "checkbox")
                     .attr("name", "function")
-                    .attr("value", checkboxVals[i])
-                    .attr("id", checkboxVals[i])
+                    .attr("value", checkbox["vals"][i])
+                    .attr("id", checkbox["vals"][i])
                     .style("opacity", 0)
-                    .property("checked", checkboxStates[i]);
+                    .property("checked", checkbox["states"][i]);
             }
             var endCheckbox = addedCheckbox.append("label").text("}")
                 .style("color", "floralwhite");
             addedCheckbox.on("change", function () {
-                for (var i = 0; i < checkboxStates.length; i++) {
-                    checkboxStates[i] = addedBoxes[i].property("checked");
-                    checkboxColors[i] = checkboxStates[i] ? linkColor(i) : "#FFFFFF";
+                for (var i = 0; i < checkbox["states"].length; i++) {
+                    checkbox["states"][i] = addedBoxes[i].property("checked");
+                    checkbox["colors"][i] = checkbox["states"][i] ? linkColor(i) : "#FFFFFF";
                 }
                 drawGraph();
                 return;
@@ -130,18 +134,18 @@ $(function () {
                         "title": graph.nodes[i].title
                     });
                     var ledgerInsertibility = false;
-                    var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[i].label);
+                    var ledgerIndex = ledger["elements"].findIndex(x => x == graph.nodes[i].label);
                     if (ledgerIndex < 0) {
-                        ledgerElements.push(graph.nodes[i].label);
-                        ledgerColors.push(nodeColor(ledgerElements.length - 1));
+                        ledger["elements"].push(graph.nodes[i].label);
+                        ledger["colors"].push(nodeColor(ledger["elements"].length - 1));
                         ledgerInsertibility = true;
                     }
                     var source = nodes.length - 1;
                     var nodeValidity = 0;
                     for (var j = 0; j < graph.nodes[i].targets.length; j++) {
 
-                        var checkboxIndex = checkboxVals.findIndex(x => x == graph.nodes[i].targets[j].type);
-                        var checkboxIndexValidity = checkboxStates[checkboxIndex];
+                        var checkboxIndex = checkbox["vals"].findIndex(x => x == graph.nodes[i].targets[j].type);
+                        var checkboxIndexValidity = checkbox["states"][checkboxIndex];
                         if (!checkboxIndexValidity)
                             continue;
                         else
@@ -156,10 +160,10 @@ $(function () {
                                 "title": graph.nodes[graph.nodes[i].targets[j].target].title
                             });
                             target = nodes.length - 1;
-                            var ledgerIndex = ledgerElements.findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
+                            var ledgerIndex = ledger["elements"].findIndex(x => x == graph.nodes[graph.nodes[i].targets[j].target].label);
                             if (ledgerIndex < 0) {
-                                ledgerElements.push(graph.nodes[graph.nodes[i].targets[j].target].label);
-                                ledgerColors.push(nodeColor(ledgerElements.length - 1));
+                                ledger["elements"].push(graph.nodes[graph.nodes[i].targets[j].target].label);
+                                ledger["colors"].push(nodeColor(ledger["elements"].length - 1));
                             }
                         }
                         links.push({
@@ -171,8 +175,8 @@ $(function () {
                     if (nodeValidity == 0) {
                         nodes.pop();
                         if (ledgerInsertibility) {
-                            ledgerElements.pop();
-                            ledgerColors.pop();
+                            ledger["elements"].pop();
+                            ledger["colors"].pop();
                         }
                     }
                 }
@@ -188,15 +192,15 @@ $(function () {
             /*
              * rendering ledger elements as per their current states
              */
-            if (ledgerElements.length > 0) {
+            if (ledger["elements"].length > 0) {
                 var addedLedger = d3.select(".form-group").append("div").attr("class", "checkbox").attr("id", "addedLedger").style(
                     "display", "inline");
                 var beginledger = addedLedger.append("label").text("{")
                     .style("color", "floralwhite")
                     .style("padding-left", "10px");
-                var addedLedgerElements = [];
-                for (var i = 0; i < ledgerElements.length; i++) {
-                    addedLedgerElements[i] = addedLedger.append("label").text(ledgerElements[i] + (i < ledgerElements.length - 1 ? ", " : "")).style("color", ledgerColors[i]);
+                var addedledger = [];
+                for (var i = 0; i < ledger["elements"].length; i++) {
+                    addedledger[i] = addedLedger.append("label").text(ledger["elements"][i] + (i < ledger["elements"].length - 1 ? ", " : "")).style("color", ledger["colors"][i]);
                 }
                 var endLedger = addedLedger.append("label").text("}")
                     .style("color", "floralwhite");
@@ -233,14 +237,14 @@ $(function () {
                     context.clearRect(0, 0, width, height);
                     localGraph.links.forEach(function (d) {
                         context.beginPath();
-                        context.strokeStyle = checkboxColors[checkboxVals.findIndex(x => x == d.type)];
+                        context.strokeStyle = checkbox["colors"][checkbox["vals"].findIndex(x => x == d.type)];
                         context.moveTo(d.source.x, d.source.y);
                         context.lineTo(d.target.x, d.target.y);
                         context.stroke();
                     });
                     localGraph.nodes.forEach(function (d) {
                         context.beginPath();
-                        context.fillStyle = ledgerColors[ledgerElements.findIndex(x => x == d.label)];
+                        context.fillStyle = ledger["colors"][ledger["elements"].findIndex(x => x == d.label)];
                         d.x = Math.max(5, Math.min(width - 5, d.x));
                         d.y = Math.max(5, Math.min(height - 5, d.y));
                         context.moveTo(d.x, d.y);
