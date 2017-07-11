@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text/css" rel="stylesheet" href="static/css/bootstrap.css">
     <link type="text/css" rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="static/css/font-awesome.css">
     <link type="text/css" rel="stylesheet" href="static/css/carbosem.css">
     <link rel="shortcut icon" href="static/image/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="static/image/favicon.ico" type="image/x-icon" />
@@ -44,7 +45,8 @@
         </div>
     </nav>
     <canvas></canvas>
-    <footer class="footer-text navbar-inverse navbar-fixed-bottom">Copyright &copy; 2017 Aly Shmahell</footer>
+    <footer class="footer-text navbar-inverse navbar-fixed-bottom">Copyright &copy; 2017 Aly Shmahell <a href="https://github.com/CarboSem"><i class="fa fa-github" aria-hidden="true"></i>
+</a></footer>
 </body>
 
 </html>
